@@ -1,69 +1,6 @@
 require("./common/bootstrap");
 
-exports["Stepper Firmware Requirement"] = {
-  setUp: function(done) {
-    this.sandbox = sinon.sandbox.create();
-    done();
-  },
-  tearDown: function(done) {
-    Board.purge();
-    this.sandbox.restore();
-    done();
-  },
-  valid: function(test) {
-    test.expect(1);
-
-    this.board = newBoard([{
-      supportedModes: [],
-    }, {
-      supportedModes: [],
-    }, {
-      supportedModes: [0, 1, 4, 8],
-    }, {
-      supportedModes: [0, 1, 3, 4, 8],
-    }]);
-
-    test.doesNotThrow(function() {
-      new Stepper({
-        board: this.board,
-        type: Stepper.TYPE.DRIVER,
-        stepsPerRev: 200,
-        pins: [2, 3]
-      });
-    }.bind(this));
-
-    test.done();
-  },
-
-  invalid: function(test) {
-    test.expect(1);
-
-    this.board = newBoard([{
-      supportedModes: [],
-    }, {
-      supportedModes: [],
-    }, {
-      supportedModes: [0, 1, 4],
-    }, {
-      supportedModes: [0, 1, 3, 4],
-    }]);
-
-    try {
-      new Stepper({
-        board: this.board,
-        type: Stepper.TYPE.DRIVER,
-        stepsPerRev: 200,
-        pins: [2, 3]
-      });
-    } catch (error) {
-      test.equals(error.message, "Stepper is not supported");
-    }
-
-    test.done();
-  },
-};
-
-exports["Stepper - constructor"] = {
+exports["Stepper - constructor"] = { 
   setUp: function(done) {
     this.sandbox = sinon.sandbox.create();
 
@@ -87,7 +24,7 @@ exports["Stepper - constructor"] = {
         pins: [2, 3]
       });
     } catch (error) {
-      test.equals(error.message, "Stepper requires a `type` number value (DRIVER, TWO_WIRE)");
+      test.equals(error.message, "Stepper requires a `device` number value (DRIVER, TWO_WIRE)");
     }
 
     test.done();
@@ -104,7 +41,7 @@ exports["Stepper - constructor"] = {
       stepsPerRev: 200,
       pins: pins
     });
-    test.equal(stepper.type, Stepper.TYPE.DRIVER);
+    test.equal(Stepper.DEVICE[stepper.device], Stepper.DEVICE.DRIVER);
     test.deepEqual(stepper.pins, pins);
 
     test.done();
@@ -121,7 +58,7 @@ exports["Stepper - constructor"] = {
       stepsPerRev: 200,
       pins: pins
     });
-    test.equal(stepper.type, Stepper.TYPE.TWO_WIRE);
+    test.equal(Stepper.DEVICE[stepper.device], Stepper.DEVICE.TWO_WIRE);
     test.deepEqual(stepper.pins, pins);
 
     test.done();
@@ -140,7 +77,7 @@ exports["Stepper - constructor"] = {
       stepsPerRev: 200,
       pins: pins
     });
-    test.equal(stepper.type, Stepper.TYPE.FOUR_WIRE);
+    test.equal(Stepper.DEVICE[stepper.device], Stepper.DEVICE.FOUR_WIRE);
     test.deepEqual(stepper.pins, pins);
 
     test.done();
@@ -154,23 +91,23 @@ exports["Stepper - constructor"] = {
     };
     var stepper = new Stepper({
       board: this.board,
-      type: Stepper.TYPE.DRIVER,
+      device: Stepper.DEVICE.DRIVER,
       stepsPerRev: 200,
       pins: pins
     });
 
-    test.equal(stepper.type, Stepper.TYPE.DRIVER);
+    test.equal(Stepper.DEVICE[stepper.device], Stepper.DEVICE.DRIVER);
     test.deepEqual(stepper.pins, pins);
 
     pins = [3, 4];
     stepper = new Stepper({
       board: this.board,
-      type: Stepper.TYPE.DRIVER,
+      device: Stepper.DEVICE.DRIVER,
       stepsPerRev: 200,
       pins: pins
     });
 
-    test.equal(stepper.type, Stepper.TYPE.DRIVER);
+    test.equal(Stepper.DEVICE[stepper.device], Stepper.DEVICE.DRIVER);
     test.deepEqual(
       stepper.pins, {
         step: pins[0],
@@ -186,7 +123,7 @@ exports["Stepper - constructor"] = {
     test.throws(function() {
       new Stepper({
         board: this.board,
-        type: Stepper.TYPE.DRIVER,
+        device: Stepper.DEVICE.DRIVER,
         stepsPerRev: 200,
         pins: {}
       });
@@ -199,7 +136,7 @@ exports["Stepper - constructor"] = {
     test.throws(function() {
       new Stepper({
         board: this.board,
-        type: Stepper.TYPE.DRIVER,
+        device: Stepper.DEVICE.DRIVER,
         stepsPerRev: 200,
         pins: {
           dir: 4,
@@ -214,7 +151,7 @@ exports["Stepper - constructor"] = {
     test.throws(function() {
       new Stepper({
         board: this.board,
-        type: Stepper.TYPE.DRIVER,
+        device: Stepper.DEVICE.DRIVER,
         stepsPerRev: 200,
         pins: {
           step: 1,
@@ -229,7 +166,7 @@ exports["Stepper - constructor"] = {
     test.doesNotThrow(function() {
       new Stepper({
         board: this.board,
-        type: Stepper.TYPE.DRIVER,
+        device: Stepper.DEVICE.DRIVER,
         stepsPerRev: 200,
         pins: {
           step: 0,
@@ -248,23 +185,23 @@ exports["Stepper - constructor"] = {
     };
     var stepper = new Stepper({
       board: this.board,
-      type: Stepper.TYPE.TWO_WIRE,
+      type: Stepper.DEVICE.TWO_WIRE,
       stepsPerRev: 200,
       pins: pins
     });
 
-    test.equal(stepper.type, Stepper.TYPE.TWO_WIRE);
+    test.equal(Stepper.DEVICE[stepper.device], Stepper.DEVICE.TWO_WIRE);
     test.deepEqual(stepper.pins, pins);
 
     pins = [3, 4];
     stepper = new Stepper({
       board: this.board,
-      type: Stepper.TYPE.TWO_WIRE,
+      device: Stepper.DEVICE.TWO_WIRE,
       stepsPerRev: 200,
       pins: pins
     });
 
-    test.equal(stepper.type, Stepper.TYPE.TWO_WIRE);
+    test.equal(Stepper.DEVICE[stepper.device], Stepper.DEVICE.TWO_WIRE);
     test.deepEqual(
       stepper.pins, {
         motor1: pins[0],
@@ -280,7 +217,7 @@ exports["Stepper - constructor"] = {
     test.throws(function() {
       new Stepper({
         board: this.board,
-        type: Stepper.TYPE.TWO_WIRE,
+        device: Stepper.DEVICE.TWO_WIRE,
         stepsPerRev: 200,
         pins: {}
       });
@@ -293,7 +230,7 @@ exports["Stepper - constructor"] = {
     test.throws(function() {
       new Stepper({
         board: this.board,
-        type: Stepper.TYPE.TWO_WIRE,
+        device: Stepper.DEVICE.TWO_WIRE,
         stepsPerRev: 200,
         pins: {
           motor2: 4,
@@ -308,7 +245,7 @@ exports["Stepper - constructor"] = {
     test.throws(function() {
       new Stepper({
         board: this.board,
-        type: Stepper.TYPE.TWO_WIRE,
+        device: Stepper.DEVICE.TWO_WIRE,
         stepsPerRev: 200,
         pins: {
           motor1: 1,
@@ -323,7 +260,7 @@ exports["Stepper - constructor"] = {
     test.doesNotThrow(function() {
       new Stepper({
         board: this.board,
-        type: Stepper.TYPE.TWO_WIRE,
+        device: Stepper.DEVICE.TWO_WIRE,
         stepsPerRev: 200,
         pins: {
           motor1: 0,
@@ -344,23 +281,23 @@ exports["Stepper - constructor"] = {
     };
     var stepper = new Stepper({
       board: this.board,
-      type: Stepper.TYPE.FOUR_WIRE,
+      device: Stepper.DEVICE.FOUR_WIRE,
       stepsPerRev: 200,
       pins: pins
     });
 
-    test.equal(stepper.type, Stepper.TYPE.FOUR_WIRE);
+    test.equal(Stepper.DEVICE[stepper.device], Stepper.DEVICE.FOUR_WIRE);
     test.deepEqual(stepper.pins, pins);
 
     pins = [3, 4, 5, 6];
     stepper = new Stepper({
       board: this.board,
-      type: Stepper.TYPE.FOUR_WIRE,
+      device: Stepper.DEVICE.FOUR_WIRE,
       stepsPerRev: 200,
       pins: pins
     });
 
-    test.equal(stepper.type, Stepper.TYPE.FOUR_WIRE);
+    test.equal(Stepper.DEVICE[stepper.device], Stepper.DEVICE.FOUR_WIRE);
     test.deepEqual(
       stepper.pins, {
         motor1: pins[0],
@@ -378,7 +315,7 @@ exports["Stepper - constructor"] = {
     test.throws(function() {
       new Stepper({
         board: this.board,
-        type: Stepper.TYPE.FOUR_WIRE,
+        device: Stepper.DEVICE.FOUR_WIRE,
         stepsPerRev: 200,
         pins: {}
       });
@@ -391,7 +328,7 @@ exports["Stepper - constructor"] = {
     test.throws(function() {
       new Stepper({
         board: this.board,
-        type: Stepper.TYPE.FOUR_WIRE,
+        device: Stepper.DEVICE.FOUR_WIRE,
         stepsPerRev: 200,
         pins: {
           motor2: 3,
@@ -408,7 +345,7 @@ exports["Stepper - constructor"] = {
     test.throws(function() {
       new Stepper({
         board: this.board,
-        type: Stepper.TYPE.FOUR_WIRE,
+        device: Stepper.DEVICE.FOUR_WIRE,
         stepsPerRev: 200,
         pins: {
           motor1: 1,
@@ -425,7 +362,7 @@ exports["Stepper - constructor"] = {
     test.throws(function() {
       new Stepper({
         board: this.board,
-        type: Stepper.TYPE.FOUR_WIRE,
+        device: Stepper.DEVICE.FOUR_WIRE,
         stepsPerRev: 200,
         pins: {
           motor1: 3,
@@ -442,7 +379,7 @@ exports["Stepper - constructor"] = {
     test.throws(function() {
       new Stepper({
         board: this.board,
-        type: Stepper.TYPE.FOUR_WIRE,
+        device: Stepper.DEVICE.FOUR_WIRE,
         stepsPerRev: 200,
         pins: {
           motor1: 3,
@@ -459,7 +396,7 @@ exports["Stepper - constructor"] = {
     test.doesNotThrow(function() {
       new Stepper({
         board: this.board,
-        type: Stepper.TYPE.FOUR_WIRE,
+        device: Stepper.DEVICE.FOUR_WIRE,
         stepsPerRev: 200,
         pins: {
           motor1: 0,
@@ -477,7 +414,7 @@ exports["Stepper - max steppers"] = {
   setUp: function(done) {
     this.sandbox = sinon.sandbox.create();
 
-    this.maxSteppers = 6;
+    this.maxSteppers = 4;
 
     this.board1 = new Board({
       io: new MockFirmata({
@@ -504,7 +441,7 @@ exports["Stepper - max steppers"] = {
 
   tearDown: function(done) {
     Board.purge();
-    this.sandbox.restore();
+    this.sandbox.restore(); 
     done();
   },
 
@@ -572,7 +509,7 @@ exports["Stepper - max steppers"] = {
   }
 };
 
-exports["Stepper - step callback"] = {
+exports["Stepper - step"] = {
   setUp: function(done) {
     this.sandbox = sinon.sandbox.create();
     this.board = new Board({
@@ -585,42 +522,390 @@ exports["Stepper - step callback"] = {
       repl: false
     });
 
-    this.stepper = new Stepper({
-      board: this.board,
-      type: Stepper.TYPE.DRIVER,
-      stepsPerRev: 200,
-      pins: [2, 3]
-    });
-
-    this.step = this.sandbox.spy(MockFirmata.prototype, "stepperStep");
+    this.digitalWrite = this.sandbox.spy(MockFirmata.prototype, "digitalWrite");
 
     done();
   },
 
   tearDown: function(done) {
-    this.step.restore();
     done();
+    this.digitalWrite.restore();
   },
 
-  step: function(test) {
-    var spy = this.sandbox.spy();
+  nosteps: function(test) {
+    this.stepper = new Stepper({
+      board: this.board,
+      type: Stepper.DEVICE.FOUR_WIRE,
+      stepsPerRev: 200,
+      pins: [2, 3, 4, 5],
+      speed: 100
+    });
+
+    test.expect(1);
+    
+    this.stepper.step(0, position => {
+      test.equal(position, 0);
+      test.done();
+    });
+    
+  },
+  
+  fourwirewhole: function(test) {
+    this.stepper = new Stepper({
+      board: this.board,
+      type: Stepper.DEVICE.FOUR_WIRE,
+      stepsPerRev: 200,
+      pins: [2, 3, 4, 5],
+      speed: 100
+    });
+
+    test.expect(21);
+    
+    this.stepper.step(5, position => {
+      [
+        [2, 0, true], [3, 1, true], [4, 1, true], [5, 0, true], // Frame 1
+        [2, 1, true], [3, 0, true], [4, 1, true], [5, 0, true], // Frame 2
+        [2, 1, true], [3, 0, true], [4, 0, true], [5, 1, true], // Frame 3
+        [2, 0, true], [3, 1, true], [4, 0, true], [5, 1, true], // Frame 0
+        [2, 0, true], [3, 1, true], [4, 1, true], [5, 0, true] //  Frame 1
+      ].forEach((args, index) => {
+        test.deepEqual(this.digitalWrite.getCall(index).args, args);
+      });
+
+      test.equal(position, 5);
+      test.done();
+    });
+    
+  },
+
+  fourwirewholeDirection: function(test) {
+    this.stepper = new Stepper({
+      board: this.board,
+      type: Stepper.DEVICE.FOUR_WIRE,
+      stepsPerRev: 200,
+      pins: [2, 3, 4, 5],
+      speed: 100,
+      direction: 0
+    });
+
+    test.expect(21);
+    
+    this.stepper.step(5, position => {
+      [
+        [2, 1, true], [3, 0, true], [4, 0, true], [5, 1, true], // Frame 3
+        [2, 1, true], [3, 0, true], [4, 1, true], [5, 0, true], // Frame 2
+        [2, 0, true], [3, 1, true], [4, 1, true], [5, 0, true], // Frame 1
+        [2, 0, true], [3, 1, true], [4, 0, true], [5, 1, true], // Frame 0
+        [2, 1, true], [3, 0, true], [4, 0, true], [5, 1, true], // Frame 3
+      ].forEach((args, index) => {
+        test.deepEqual(this.digitalWrite.getCall(index).args, args);
+      });
+
+      test.equal(position, -5);
+      test.done();
+    });
+    
+  },
+
+  fourwirewholeNegativeSteps: function(test) {
+    this.stepper = new Stepper({
+      board: this.board,
+      type: Stepper.DEVICE.FOUR_WIRE,
+      stepsPerRev: 200,
+      pins: [2, 3, 4, 5],
+      speed: 100
+    });
+
+    test.expect(21);
+    
+    this.stepper.step(-5, position => {
+      [
+        [2, 1, true], [3, 0, true], [4, 0, true], [5, 1, true], // Frame 3
+        [2, 1, true], [3, 0, true], [4, 1, true], [5, 0, true], // Frame 2
+        [2, 0, true], [3, 1, true], [4, 1, true], [5, 0, true], // Frame 1
+        [2, 0, true], [3, 1, true], [4, 0, true], [5, 1, true], // Frame 0
+        [2, 1, true], [3, 0, true], [4, 0, true], [5, 1, true], // Frame 3
+      ].forEach((args, index) => {
+        test.deepEqual(this.digitalWrite.getCall(index).args, args, "Incorrect args on step " + Math.floor(index / 4));
+      });
+
+      test.equal(position, -5);
+      test.done();
+    });
+    
+  },
+
+  fourwirewholeDirectionNegativeSteps: function(test) {
+    this.stepper = new Stepper({
+      board: this.board,
+      type: Stepper.DEVICE.FOUR_WIRE,
+      stepsPerRev: 200,
+      pins: [2, 3, 4, 5],
+      speed: 100,
+      direction: 0
+    });
+
+    test.expect(21);
+    
+    this.stepper.step(-5, position => {
+      [
+        [2, 0, true], [3, 1, true], [4, 1, true], [5, 0, true], // Frame 1
+        [2, 1, true], [3, 0, true], [4, 1, true], [5, 0, true], // Frame 2
+        [2, 1, true], [3, 0, true], [4, 0, true], [5, 1, true], // Frame 3
+        [2, 0, true], [3, 1, true], [4, 0, true], [5, 1, true], // Frame 0
+        [2, 0, true], [3, 1, true], [4, 1, true], [5, 0, true] //  Frame 1
+      ].forEach((args, index) => {
+        test.deepEqual(this.digitalWrite.getCall(index).args, args, "Incorrect args on step " + Math.floor(index / 4));
+      });
+
+      test.equal(position, 5);
+      test.done();
+    });
+    
+  },
+
+  fourwirewholeChangeStepsWhileMoving: function(test) {
+    this.stepper = new Stepper({
+      board: this.board,
+      type: Stepper.DEVICE.FOUR_WIRE,
+      stepsPerRev: 200,
+      pins: [2, 3, 4, 5],
+      speed: 100,
+      direction: 0
+    });
 
     test.expect(1);
 
-    this.stepper.cw().step(1, spy);
-    // simulate successful callback from board.io
-    this.step.getCall(0).args[6]();
+    this.stepper.step(1000);
 
-    // test that callback called up the chain to .step()
-    test.equal(spy.getCall(0).args[0], null);
-    test.done();
+    setTimeout(() => {
+      this.stepper.step(-10, position => {
+        test.equal(position, 0);
+        test.done();
+      });
+    }, 100);
+  },
+
+  fourwirewholeChangeStepsWithAccelWhileMoving: function(test) {
+    this.stepper = new Stepper({
+      board: this.board,
+      type: Stepper.DEVICE.FOUR_WIRE,
+      stepsPerRev: 200,
+      pins: [2, 3, 4, 5],
+      speed: 100,
+      acceleration: 500
+    });
+
+    test.expect(1);
+
+    this.stepper.step(1000);
+
+    setTimeout(() => {
+      this.stepper.step(-10, position => {
+        test.equal(position, -6);
+        test.done();
+      });
+    }, 300);
+  },
+
+  fourwirewholePosition: function(test) {
+    this.stepper = new Stepper({
+      board: this.board,
+      type: Stepper.DEVICE.FOUR_WIRE,
+      stepsPerRev: 200,
+      pins: [2, 3, 4, 5],
+      speed: 100,
+      position: 1000
+    });
+
+    test.expect(22);
+    
+    this.stepper.step(5, position => {
+      [
+        [2, 0, true], [3, 1, true], [4, 1, true], [5, 0, true], // Frame 1
+        [2, 1, true], [3, 0, true], [4, 1, true], [5, 0, true], // Frame 2
+        [2, 1, true], [3, 0, true], [4, 0, true], [5, 1, true], // Frame 3
+        [2, 0, true], [3, 1, true], [4, 0, true], [5, 1, true], // Frame 0
+        [2, 0, true], [3, 1, true], [4, 1, true], [5, 0, true] //  Frame 1
+      ].forEach((args, index) => {
+        test.deepEqual(this.digitalWrite.getCall(index).args, args);
+      });
+
+      test.equal(position, 1005);
+      test.equal(this.stepper.absolutePosition, 5);
+      test.done();
+    });
+    
+  },
+  
+  fourwirehalf: function(test) {
+    this.stepper = new Stepper({
+      board: this.board,
+      type: Stepper.DEVICE.FOUR_WIRE,
+      stepType: Stepper.STEPTYPE.HALF,
+      stepsPerRev: 400,
+      pins: [2, 3, 4, 5],
+      speed: 100
+    });
+    
+    test.expect(37);
+    
+    this.stepper.step(9, position => {
+      [
+        [2, 0, true], [3, 1, true], [4, 0, true], [5, 0, true], // Frame 1
+        [2, 0, true], [3, 1, true], [4, 1, true], [5, 0, true], // Frame 2
+        [2, 0, true], [3, 0, true], [4, 1, true], [5, 0, true], // Frame 3
+        [2, 1, true], [3, 0, true], [4, 1, true], [5, 0, true], // Frame 4
+        [2, 1, true], [3, 0, true], [4, 0, true], [5, 0, true], // Frame 5
+        [2, 1, true], [3, 0, true], [4, 0, true], [5, 1, true], // Frame 6
+        [2, 0, true], [3, 0, true], [4, 0, true], [5, 1, true], // Frame 7
+        [2, 0, true], [3, 1, true], [4, 0, true], [5, 1, true], // Frame 0
+        [2, 0, true], [3, 1, true], [4, 0, true], [5, 0, true] //  Frame 1
+      ].forEach((args, index) => {
+        test.deepEqual(this.digitalWrite.getCall(index).args, args);
+      });
+
+      test.equal(position, 9);
+      test.done();
+    });
+  },
+
+  fourwirehalfDirection: function(test) {
+    this.stepper = new Stepper({
+      board: this.board,
+      type: Stepper.DEVICE.FOUR_WIRE,
+      stepType: Stepper.STEPTYPE.HALF,
+      stepsPerRev: 400,
+      pins: [2, 3, 4, 5],
+      speed: 100,
+      direction: 0
+    });
+    
+    test.expect(37);
+    
+    this.stepper.step(9, position => {
+      [
+        [2, 0, true], [3, 0, true], [4, 0, true], [5, 1, true], // Frame 7
+        [2, 1, true], [3, 0, true], [4, 0, true], [5, 1, true], // Frame 6
+        [2, 1, true], [3, 0, true], [4, 0, true], [5, 0, true], // Frame 5
+        [2, 1, true], [3, 0, true], [4, 1, true], [5, 0, true], // Frame 4
+        [2, 0, true], [3, 0, true], [4, 1, true], [5, 0, true], // Frame 3
+        [2, 0, true], [3, 1, true], [4, 1, true], [5, 0, true], // Frame 2
+        [2, 0, true], [3, 1, true], [4, 0, true], [5, 0, true], // Frame 1
+        [2, 0, true], [3, 1, true], [4, 0, true], [5, 1, true], // Frame 0
+        [2, 0, true], [3, 0, true], [4, 0, true], [5, 1, true], // Frame 7
+      ].forEach((args, index) => {
+        test.deepEqual(this.digitalWrite.getCall(index).args, args, "Incorrect args on step " + Math.floor(index / 4));
+      });
+
+      test.equal(position, -9);
+      test.done();
+    });
+  },
+
+  fourwirehalfNegativeSteps: function(test) {
+    this.stepper = new Stepper({
+      board: this.board,
+      type: Stepper.DEVICE.FOUR_WIRE,
+      stepType: Stepper.STEPTYPE.HALF,
+      stepsPerRev: 400,
+      pins: [2, 3, 4, 5],
+      speed: 100
+    });
+    
+    test.expect(37);
+    
+    this.stepper.step(-9, position => {
+      [
+        [2, 0, true], [3, 0, true], [4, 0, true], [5, 1, true], // Frame 7
+        [2, 1, true], [3, 0, true], [4, 0, true], [5, 1, true], // Frame 6
+        [2, 1, true], [3, 0, true], [4, 0, true], [5, 0, true], // Frame 5
+        [2, 1, true], [3, 0, true], [4, 1, true], [5, 0, true], // Frame 4
+        [2, 0, true], [3, 0, true], [4, 1, true], [5, 0, true], // Frame 3
+        [2, 0, true], [3, 1, true], [4, 1, true], [5, 0, true], // Frame 2
+        [2, 0, true], [3, 1, true], [4, 0, true], [5, 0, true], // Frame 1
+        [2, 0, true], [3, 1, true], [4, 0, true], [5, 1, true], // Frame 0
+        [2, 0, true], [3, 0, true], [4, 0, true], [5, 1, true], // Frame 7
+      ].forEach((args, index) => {
+        test.deepEqual(this.digitalWrite.getCall(index).args, args, "Incorrect args on step " + Math.floor(index / 4));
+      });
+
+      test.equal(position, -9);
+      test.done();
+    });
+  },
+
+  fourwirehalfDirectionNegativeSteps: function(test) {
+    this.stepper = new Stepper({
+      board: this.board,
+      type: Stepper.DEVICE.FOUR_WIRE,
+      stepType: Stepper.STEPTYPE.HALF,
+      stepsPerRev: 400,
+      pins: [2, 3, 4, 5],
+      speed: 100,
+      direction: 0
+    });
+    
+    test.expect(37);
+    
+    this.stepper.step(-9, position => {
+      [
+        [2, 0, true], [3, 1, true], [4, 0, true], [5, 0, true], // Frame 1
+        [2, 0, true], [3, 1, true], [4, 1, true], [5, 0, true], // Frame 2
+        [2, 0, true], [3, 0, true], [4, 1, true], [5, 0, true], // Frame 3
+        [2, 1, true], [3, 0, true], [4, 1, true], [5, 0, true], // Frame 4
+        [2, 1, true], [3, 0, true], [4, 0, true], [5, 0, true], // Frame 5
+        [2, 1, true], [3, 0, true], [4, 0, true], [5, 1, true], // Frame 6
+        [2, 0, true], [3, 0, true], [4, 0, true], [5, 1, true], // Frame 7
+        [2, 0, true], [3, 1, true], [4, 0, true], [5, 1, true], // Frame 0
+        [2, 0, true], [3, 1, true], [4, 0, true], [5, 0, true] //  Frame 1
+      ].forEach((args, index) => {
+        test.deepEqual(this.digitalWrite.getCall(index).args, args);
+      });
+
+      test.equal(position, 9);
+      test.done();
+    });
+  },
+
+  fourwirehalfPosition: function(test) {
+    this.stepper = new Stepper({
+      board: this.board,
+      type: Stepper.DEVICE.FOUR_WIRE,
+      stepType: Stepper.STEPTYPE.HALF,
+      stepsPerRev: 400,
+      pins: [2, 3, 4, 5],
+      speed: 100,
+      position: 1000
+    });
+    
+    test.expect(38);
+    
+    this.stepper.step(9, position => {
+      [
+        [2, 0, true], [3, 1, true], [4, 0, true], [5, 0, true], // Frame 1
+        [2, 0, true], [3, 1, true], [4, 1, true], [5, 0, true], // Frame 2
+        [2, 0, true], [3, 0, true], [4, 1, true], [5, 0, true], // Frame 3
+        [2, 1, true], [3, 0, true], [4, 1, true], [5, 0, true], // Frame 4
+        [2, 1, true], [3, 0, true], [4, 0, true], [5, 0, true], // Frame 5
+        [2, 1, true], [3, 0, true], [4, 0, true], [5, 1, true], // Frame 6
+        [2, 0, true], [3, 0, true], [4, 0, true], [5, 1, true], // Frame 7
+        [2, 0, true], [3, 1, true], [4, 0, true], [5, 1, true], // Frame 0
+        [2, 0, true], [3, 1, true], [4, 0, true], [5, 0, true] //  Frame 1
+      ].forEach((args, index) => {
+        test.deepEqual(this.digitalWrite.getCall(index).args, args);
+      });
+
+      test.equal(position, 1009);
+      test.equal(this.stepper.absolutePosition, 9);
+      test.done();
+    });
   }
 };
 
-exports["Stepper - set direction required before step"] = {
+exports["Stepper - step three-wire"] = {
   setUp: function(done) {
     this.sandbox = sinon.sandbox.create();
-
     this.board = new Board({
       io: new MockFirmata({
         pins: [{
@@ -631,49 +916,569 @@ exports["Stepper - set direction required before step"] = {
       repl: false
     });
 
-    this.stepper = new Stepper({
-      board: this.board,
-      type: Stepper.TYPE.DRIVER,
-      stepsPerRev: 200,
-      pins: [2, 3]
-    });
-
-    this.stepperStep = this.sandbox.spy(MockFirmata.prototype, "stepperStep");
+    this.digitalWrite = this.sandbox.spy(MockFirmata.prototype, "digitalWrite");
 
     done();
   },
 
   tearDown: function(done) {
-    this.stepperStep.restore();
+    done();
+    this.digitalWrite.restore();
+  },
+  
+  threewirewhole: function(test) {
+    this.stepper = new Stepper({
+      board: this.board,
+      type: Stepper.DEVICE.THREE_WIRE,
+      stepsPerRev: 200,
+      pins: [2, 3, 4],
+      speed: 100
+    });
+
+    test.expect(13);
+    
+    this.stepper.step(4, position => {
+      [
+        [2, 0, true], [3, 0, true], [4, 1, true], // Frame 1
+        [2, 0, true], [3, 1, true], [4, 0, true], // Frame 2
+        [2, 1, true], [3, 0, true], [4, 0, true], // Frame 0
+        [2, 0, true], [3, 0, true], [4, 1, true] //  Frame 1
+      ].forEach((args, index) => {
+        test.deepEqual(this.digitalWrite.getCall(index).args, args);
+      });
+
+      test.equal(position, 4);
+      test.done();
+    });
+    
+  },
+
+  threewirewholeDirection: function(test) {
+    this.stepper = new Stepper({
+      board: this.board,
+      type: Stepper.DEVICE.THREE_WIRE,
+      stepsPerRev: 200,
+      pins: [2, 3, 4],
+      speed: 100,
+      direction: 0
+    });
+
+    test.expect(13);
+    
+    this.stepper.step(4, position => {
+      [
+        [2, 0, true], [3, 1, true], [4, 0, true], // Frame 2
+        [2, 0, true], [3, 0, true], [4, 1, true], // Frame 1
+        [2, 1, true], [3, 0, true], [4, 0, true], // Frame 0
+        [2, 0, true], [3, 1, true], [4, 0, true], // Frame 2
+      ].forEach((args, index) => {
+        test.deepEqual(this.digitalWrite.getCall(index).args, args);
+      });
+
+      test.equal(position, -4);
+      test.done();
+    });
+    
+  },
+
+  threewirewholeNegativeSteps: function(test) {
+    this.stepper = new Stepper({
+      board: this.board,
+      type: Stepper.DEVICE.THREE_WIRE,
+      stepsPerRev: 200,
+      pins: [2, 3, 4],
+      speed: 100
+    });
+
+    test.expect(13);
+    
+    this.stepper.step(-4, position => {
+      [
+        [2, 0, true], [3, 1, true], [4, 0, true], // Frame 2
+        [2, 0, true], [3, 0, true], [4, 1, true], // Frame 1
+        [2, 1, true], [3, 0, true], [4, 0, true], // Frame 0
+        [2, 0, true], [3, 1, true], [4, 0, true], // Frame 2
+      ].forEach((args, index) => {
+        test.deepEqual(this.digitalWrite.getCall(index).args, args, "Incorrect args on step " + Math.floor(index / 3));
+      });
+
+      test.equal(position, -4);
+      test.done();
+    });
+    
+  },
+
+  threewirewholeDirectionNegativeSteps: function(test) {
+    this.stepper = new Stepper({
+      board: this.board,
+      type: Stepper.DEVICE.THREE_WIRE,
+      stepsPerRev: 200,
+      pins: [2, 3, 4],
+      speed: 100,
+      direction: 0
+    });
+
+    test.expect(13);
+    
+    this.stepper.step(-4, position => {
+      [
+        [2, 0, true], [3, 0, true], [4, 1, true], // Frame 1
+        [2, 0, true], [3, 1, true], [4, 0, true], // Frame 2
+        [2, 1, true], [3, 0, true], [4, 0, true], // Frame 0
+        [2, 0, true], [3, 0, true], [4, 1, true] //  Frame 1
+      ].forEach((args, index) => {
+        test.deepEqual(this.digitalWrite.getCall(index).args, args, "Incorrect args on step " + Math.floor(index / 3));
+      });
+
+      test.equal(position, 4);
+      test.done();
+    });
+    
+  },
+
+  threewirewholePosition: function(test) {
+    this.stepper = new Stepper({
+      board: this.board,
+      type: Stepper.DEVICE.THREE_WIRE,
+      stepsPerRev: 200,
+      pins: [2, 3, 4],
+      speed: 100,
+      position: 1000
+    });
+
+    test.expect(14);
+    
+    this.stepper.step(4, position => {
+      [
+        [2, 0, true], [3, 0, true], [4, 1, true], // Frame 0
+        [2, 0, true], [3, 1, true], [4, 0, true], //  Frame 1
+        [2, 1, true], [3, 0, true], [4, 0, true], // Frame 2
+        [2, 0, true], [3, 0, true], [4, 1, true], // Frame 0
+      ].forEach((args, index) => {
+        test.deepEqual(this.digitalWrite.getCall(index).args, args);
+      });
+
+      test.equal(position, 1004);
+      test.equal(this.stepper.absolutePosition, 4);
+      test.done();
+    });
+    
+  },
+  
+  threewirehalf: function(test) {
+    this.stepper = new Stepper({
+      board: this.board,
+      type: Stepper.DEVICE.THREE_WIRE,
+      stepType: Stepper.STEPTYPE.HALF,
+      stepsPerRev: 400,
+      pins: [2, 3, 4],
+      speed: 100
+    });
+    
+    test.expect(22);
+    
+    this.stepper.step(7, position => {
+      [
+        [2, 1, true], [3, 0, true], [4, 1, true], // Frame 1
+        [2, 0, true], [3, 0, true], [4, 1, true], // Frame 2
+        [2, 0, true], [3, 1, true], [4, 1, true], // Frame 3
+        [2, 0, true], [3, 1, true], [4, 0, true], // Frame 4
+        [2, 1, true], [3, 1, true], [4, 0, true], // Frame 5
+        [2, 1, true], [3, 0, true], [4, 0, true], // Frame 0
+        [2, 1, true], [3, 0, true], [4, 1, true] //  Frame 1
+      ].forEach((args, index) => {
+        test.deepEqual(this.digitalWrite.getCall(index).args, args);
+      });
+
+      test.equal(position, 7);
+      test.done();
+    });
+  },
+
+  threewirehalfDirection: function(test) {
+    this.stepper = new Stepper({
+      board: this.board,
+      type: Stepper.DEVICE.THREE_WIRE,
+      stepType: Stepper.STEPTYPE.HALF,
+      stepsPerRev: 400,
+      pins: [2, 3, 4],
+      speed: 100,
+      direction: 0
+    });
+    
+    test.expect(22);
+    
+    this.stepper.step(7, position => {
+      [
+        [2, 1, true], [3, 1, true], [4, 0, true], // Frame 5
+        [2, 0, true], [3, 1, true], [4, 0, true], // Frame 4
+        [2, 0, true], [3, 1, true], [4, 1, true], // Frame 3
+        [2, 0, true], [3, 0, true], [4, 1, true], // Frame 2
+        [2, 1, true], [3, 0, true], [4, 1, true], // Frame 1
+        [2, 1, true], [3, 0, true], [4, 0, true], // Frame 0
+        [2, 1, true], [3, 1, true], [4, 0, true], // Frame 5
+      ].forEach((args, index) => {
+        test.deepEqual(this.digitalWrite.getCall(index).args, args, "Incorrect args on step " + Math.floor(index / 3));
+      });
+
+      test.equal(position, -7);
+      test.done();
+    });
+  },
+
+  threewirehalfNegativeSteps: function(test) {
+    this.stepper = new Stepper({
+      board: this.board,
+      type: Stepper.DEVICE.THREE_WIRE,
+      stepType: Stepper.STEPTYPE.HALF,
+      stepsPerRev: 400,
+      pins: [2, 3, 4],
+      speed: 100
+    });
+    
+    test.expect(22);
+    
+    this.stepper.step(-7, position => {
+      [
+        [2, 1, true], [3, 1, true], [4, 0, true], // Frame 5
+        [2, 0, true], [3, 1, true], [4, 0, true], // Frame 4
+        [2, 0, true], [3, 1, true], [4, 1, true], // Frame 3
+        [2, 0, true], [3, 0, true], [4, 1, true], // Frame 2
+        [2, 1, true], [3, 0, true], [4, 1, true], // Frame 1
+        [2, 1, true], [3, 0, true], [4, 0, true], // Frame 0
+        [2, 1, true], [3, 1, true], [4, 0, true], // Frame 5
+      ].forEach((args, index) => {
+        test.deepEqual(this.digitalWrite.getCall(index).args, args, "Incorrect args on step " + Math.floor(index / 3));
+      });
+
+      test.equal(position, -7);
+      test.done();
+    });
+  },
+
+  threewirehalfDirectionNegativeSteps: function(test) {
+    this.stepper = new Stepper({
+      board: this.board,
+      type: Stepper.DEVICE.THREE_WIRE,
+      stepType: Stepper.STEPTYPE.HALF,
+      stepsPerRev: 400,
+      pins: [2, 3, 4],
+      speed: 100,
+      direction: 0
+    });
+    
+    test.expect(22);
+    
+    this.stepper.step(-7, position => {
+      [
+        [2, 1, true], [3, 0, true], [4, 1, true], // Frame 1
+        [2, 0, true], [3, 0, true], [4, 1, true], // Frame 2
+        [2, 0, true], [3, 1, true], [4, 1, true], // Frame 3
+        [2, 0, true], [3, 1, true], [4, 0, true], // Frame 4
+        [2, 1, true], [3, 1, true], [4, 0, true], // Frame 5
+        [2, 1, true], [3, 0, true], [4, 0, true], // Frame 0
+        [2, 1, true], [3, 0, true], [4, 1, true] //  Frame 1
+      ].forEach((args, index) => {
+        test.deepEqual(this.digitalWrite.getCall(index).args, args);
+      });
+
+      test.equal(position, 7);
+      test.done();
+    });
+  },
+
+  threewirehalfPosition: function(test) {
+    this.stepper = new Stepper({
+      board: this.board,
+      type: Stepper.DEVICE.THREE_WIRE,
+      stepType: Stepper.STEPTYPE.HALF,
+      stepsPerRev: 400,
+      pins: [2, 3, 4],
+      speed: 100,
+      position: 1000
+    });
+    
+    test.expect(23);
+    
+    this.stepper.step(7, position => {
+      [
+        [2, 1, true], [3, 0, true], [4, 1, true], // Frame 1
+        [2, 0, true], [3, 0, true], [4, 1, true], // Frame 2
+        [2, 0, true], [3, 1, true], [4, 1, true], // Frame 3
+        [2, 0, true], [3, 1, true], [4, 0, true], // Frame 4
+        [2, 1, true], [3, 1, true], [4, 0, true], // Frame 5
+        [2, 1, true], [3, 0, true], [4, 0, true], // Frame 0
+        [2, 1, true], [3, 0, true], [4, 1, true] //  Frame 1
+      ].forEach((args, index) => {
+        test.deepEqual(this.digitalWrite.getCall(index).args, args);
+      });
+
+      test.equal(position, 1007);
+      test.equal(this.stepper.absolutePosition, 7);
+      test.done();
+    });
+  }
+};
+
+exports["Stepper - units param"] = {
+  setUp: function(done) {
+    this.sandbox = sinon.sandbox.create();
+    this.board = new Board({
+      io: new MockFirmata({
+        pins: [{
+          supportedModes: [8]
+        }]
+      }),
+      debug: false,
+      repl: false
+    });
+
+    this.digitalWrite = this.sandbox.spy(MockFirmata.prototype, "digitalWrite");
+
     done();
   },
 
-  directionSet: function(test) {
-    var spy = this.sandbox.spy();
+  tearDown: function(done) {
+    done();
+    this.digitalWrite.restore();
+  },
+
+  degrees: function(test) {
+    this.stepper = new Stepper({
+      board: this.board,
+      pins: [2, 3, 4, 5],
+      speed: 100,
+      units: "DEGREES"
+    });
+
+    test.expect(21);
+    
+    this.stepper.to(9, position => {
+      [
+        [2, 0, true], [3, 1, true], [4, 1, true], [5, 0, true], // Frame 1
+        [2, 1, true], [3, 0, true], [4, 1, true], [5, 0, true], // Frame 2
+        [2, 1, true], [3, 0, true], [4, 0, true], [5, 1, true], // Frame 3
+        [2, 0, true], [3, 1, true], [4, 0, true], [5, 1, true], // Frame 0
+        [2, 0, true], [3, 1, true], [4, 1, true], [5, 0, true] //  Frame 1
+      ].forEach((args, index) => {
+        test.deepEqual(this.digitalWrite.getCall(index).args, args);
+      });
+
+      test.equal(position, 5);
+      test.done();
+    });
+    
+  },
+
+  rads: function(test) {
+    this.stepper = new Stepper({
+      board: this.board,
+      pins: [2, 3, 4, 5],
+      speed: 100,
+      units: "RADS"
+    });
+
+    test.expect(21);
+    
+    this.stepper.to(0.15707, position => {
+      [
+        [2, 0, true], [3, 1, true], [4, 1, true], [5, 0, true], // Frame 1
+        [2, 1, true], [3, 0, true], [4, 1, true], [5, 0, true], // Frame 2
+        [2, 1, true], [3, 0, true], [4, 0, true], [5, 1, true], // Frame 3
+        [2, 0, true], [3, 1, true], [4, 0, true], [5, 1, true], // Frame 0
+        [2, 0, true], [3, 1, true], [4, 1, true], [5, 0, true] //  Frame 1
+      ].forEach((args, index) => {
+        test.deepEqual(this.digitalWrite.getCall(index).args, args);
+      });
+
+      test.equal(position, 5);
+      test.done();
+    });
+    
+  },
+
+  revs: function(test) {
+    this.stepper = new Stepper({
+      board: this.board,
+      pins: [2, 3, 4, 5],
+      speed: 100,
+      units: "REVS"
+    });
+
+    test.expect(21);
+    
+    this.stepper.to(0.025, position => {
+      [
+        [2, 0, true], [3, 1, true], [4, 1, true], [5, 0, true], // Frame 1
+        [2, 1, true], [3, 0, true], [4, 1, true], [5, 0, true], // Frame 2
+        [2, 1, true], [3, 0, true], [4, 0, true], [5, 1, true], // Frame 3
+        [2, 0, true], [3, 1, true], [4, 0, true], [5, 1, true], // Frame 0
+        [2, 0, true], [3, 1, true], [4, 1, true], [5, 0, true] //  Frame 1
+      ].forEach((args, index) => {
+        test.deepEqual(this.digitalWrite.getCall(index).args, args);
+      });
+
+      test.equal(position, 5);
+      test.done();
+    });
+    
+  },
+
+  customUnits: function(test) {
+    this.stepper = new Stepper({
+      board: this.board,
+      pins: [2, 3, 4, 5],
+      speed: 100,
+      units: function(value) {
+        // This imaginary mechanical assembly moves a platform 
+        // 2 inches for every full rotation of the stepper.
+        // This allows speed, position, to, acceleration, and
+        // deceleration to receive inch values in their arguments
+        return value * 200 / 2;
+      }
+    });
+
+    test.expect(21);
+    
+    this.stepper.to(0.05, position => {
+      [
+        [2, 0, true], [3, 1, true], [4, 1, true], [5, 0, true], // Frame 1
+        [2, 1, true], [3, 0, true], [4, 1, true], [5, 0, true], // Frame 2
+        [2, 1, true], [3, 0, true], [4, 0, true], [5, 1, true], // Frame 3
+        [2, 0, true], [3, 1, true], [4, 0, true], [5, 1, true], // Frame 0
+        [2, 0, true], [3, 1, true], [4, 1, true], [5, 0, true] //  Frame 1
+      ].forEach((args, index) => {
+        test.deepEqual(this.digitalWrite.getCall(index).args, args);
+      });
+
+      test.equal(position, 5);
+      test.done();
+    });
+    
+  }
+};
+
+exports["Stepper - speed param"] = {
+  setUp: function(done) {
+    this.sandbox = sinon.sandbox.create();
+    this.board = new Board({
+      io: new MockFirmata({
+        pins: [{
+          supportedModes: [8]
+        }]
+      }),
+      debug: false,
+      repl: false
+    });
+
+    this.digitalWrite = this.sandbox.spy(MockFirmata.prototype, "digitalWrite");
+
+    done();
+  },
+
+  tearDown: function(done) {
+    done();
+    this.digitalWrite.restore();
+  },
+
+  speed100: function(test) {
+    this.stepper = new Stepper({
+      board: this.board,
+      pins: [2, 3, 4, 5],
+      speed: 100
+    });
+
+    test.expect(3);
+    
+    let startTime = process.hrtime();
+    this.stepper.to(10, position => {
+      let endTime = process.hrtime(startTime);
+      test.equal(position, 10);
+      test.equal(endTime[0], 0);
+      test.ok(Math.abs(endTime[1] / 1e6 - 100) < 10);
+      test.done();
+    });
+    
+  },
+
+  speed200: function(test) {
+    this.stepper = new Stepper({
+      board: this.board,
+      pins: [2, 3, 4, 5],
+      speed: 200
+    });
+
+    test.expect(3);
+    
+    let startTime = process.hrtime();
+    this.stepper.to(10, position => {
+      let endTime = process.hrtime(startTime);
+      test.equal(position, 10);
+      test.equal(endTime[0], 0);
+      test.ok(Math.abs(endTime[1] / 1e6 - 50) < 10);
+      test.done();
+    });
+    
+  }
+};
+
+exports["Stepper - acceleration param"] = {
+  setUp: function(done) {
+    this.sandbox = sinon.sandbox.create();
+    this.board = new Board({
+      io: new MockFirmata({
+        pins: [{
+          supportedModes: [8]
+        }]
+      }),
+      debug: false,
+      repl: false
+    });
+
+    this.digitalWrite = this.sandbox.spy(MockFirmata.prototype, "digitalWrite");
+
+    done();
+  },
+
+  tearDown: function(done) {
+    done();
+    this.digitalWrite.restore();
+  },
+
+  default: function(test) {
+    this.stepper = new Stepper({
+      board: this.board,
+      pins: [2, 3, 4, 5],
+      speed: 100
+    });
 
     test.expect(2);
-
-    // Call .step() before and after setting direction
-    this.stepper.step(1, spy);
-    this.stepper.cw();
-    this.stepper.step(1, spy);
-
-    // simulate callback on success for second call
-    // Note, stepper should error out before this.stepperStep()
-    // is called before direction is set, thus getCall(0) here.
-    this.stepperStep.getCall(0).args[6]();
-
-    test.ok(!!spy.getCall(0).args[0]);
-    test.ok(!spy.getCall(1).args[0]);
-
+    test.equal(this.stepper.accel().rate, 0);
+    test.equal(this.stepper.decel().rate, 0);
     test.done();
+    
+  },
+
+  linear100: function(test) {
+    this.stepper = new Stepper({
+      board: this.board,
+      pins: [2, 3, 4, 5],
+      speed: 100,
+      acceleration: 100,
+      deceleration: 100
+    });
+
+    test.expect(2);
+    test.equal(this.stepper.accel().rate, 100);
+    test.equal(this.stepper.decel().rate, 100);
+    test.done();
+    
   }
 };
 
-exports["Stepper - chainable direction"] = {
+exports["Stepper - stop()"] = {
   setUp: function(done) {
     this.sandbox = sinon.sandbox.create();
-
     this.board = new Board({
       io: new MockFirmata({
         pins: [{
@@ -684,77 +1489,616 @@ exports["Stepper - chainable direction"] = {
       repl: false
     });
 
-    this.stepper = new Stepper({
-      board: this.board,
-      type: Stepper.TYPE.DRIVER,
-      stepsPerRev: 200,
-      pins: [2, 3]
-    });
+    this.digitalWrite = this.sandbox.spy(MockFirmata.prototype, "digitalWrite");
 
     done();
   },
 
   tearDown: function(done) {
     done();
+    this.digitalWrite.restore();
   },
 
-  chainable: function(test) {
+  stop: function(test) {
+    this.stepper = new Stepper({
+      board: this.board,
+      pins: [2, 3, 4, 5]
+    });
+
     test.expect(2);
-
-    // .cw() and .ccw() return `this`
-    test.equal(this.stepper.cw(), this.stepper);
-    test.equal(this.stepper.ccw(), this.stepper);
-
-    test.done();
+    this.stepper.speed(100).to(100);
+    
+    setTimeout(() => {
+      this.stepper.stop(position => {
+        test.equal(position, 9);
+        test.equal(this.stepper.currentSpeed, 0);
+        test.done();
+      });
+    }, 95);
+    
   }
 };
 
-exports["Stepper - rpm / speed"] = {
+exports["Stepper - zero()"] = {
   setUp: function(done) {
     this.sandbox = sinon.sandbox.create();
-
     this.board = new Board({
       io: new MockFirmata({
         pins: [{
-          supportedModes: [8],
-        }, ]
+          supportedModes: [8]
+        }]
       }),
       debug: false,
       repl: false
     });
 
-    this.pinMode = this.sandbox.spy(MockFirmata.prototype, "pinMode");
-    this.stepper = new Stepper({
-      board: this.board,
-      type: Stepper.TYPE.DRIVER,
-      stepsPerRev: 200,
-      pins: [2, 3]
-    });
+    this.digitalWrite = this.sandbox.spy(MockFirmata.prototype, "digitalWrite");
+
     done();
   },
 
   tearDown: function(done) {
-    this.pinMode.restore();
+    this.digitalWrite.restore();
     done();
   },
 
-  pinMode: function(test) {
-    test.expect(1);
-    test.equal(this.pinMode.callCount, 2);
-    test.done();
+  zeroWhileMoving: function(test) {
+    this.stepper = new Stepper({
+      board: this.board,
+      pins: [2, 3, 4, 5]
+    });
+
+    test.expect(7);
+
+    this.stepper.speed(100).to(30, position => {
+      test.equal(this.digitalWrite.callCount, 200);
+      test.equal(position, 30);
+      test.done();
+    });
+
+    setTimeout(() => {
+      test.equal(this.stepper.position(), 20);
+      test.equal(this.stepper.absolutePosition, 20);
+      test.equal(this.digitalWrite.callCount, 80);
+      this.stepper.zero();
+      test.equal(this.stepper.position(), 0);
+      test.equal(this.stepper.absolutePosition, 20);
+    }, 205);
+
+  }
+
+};
+
+exports["Stepper - direction()"] = {
+  setUp: function(done) {
+    this.sandbox = sinon.sandbox.create();
+    this.board = new Board({
+      io: new MockFirmata({
+        pins: [{
+          supportedModes: [8]
+        }]
+      }),
+      debug: false,
+      repl: false
+    });
+
+    this.digitalWrite = this.sandbox.spy(MockFirmata.prototype, "digitalWrite");
+
+    done();
   },
 
-  "rpm to speed": function(test) {
-    test.expect(1);
+  tearDown: function(done) {
+    done();
+    this.digitalWrite.restore();
+  },
+
+  directionCW: function(test) {
+    this.stepper = new Stepper({
+      board: this.board,
+      type: Stepper.DEVICE.FOUR_WIRE,
+      stepsPerRev: 200,
+      pins: [2, 3, 4, 5],
+      speed: 100
+    });
+
+    test.expect(2);
+    
+    this.stepper.direction(1).step(5, position => {
+      test.equal(position, 5);
+      test.equal(this.stepper.direction(), 1);
+      test.done();
+    });
+    
+  },
+
+  directionCWNegativeSteps: function(test) {
+    this.stepper = new Stepper({
+      board: this.board,
+      type: Stepper.DEVICE.FOUR_WIRE,
+      stepsPerRev: 200,
+      pins: [2, 3, 4, 5],
+      speed: 100
+    });
+
+    test.expect(2);
+    
+    this.stepper.direction(1).step(-5, position => {
+      test.equal(position, -5);
+      test.equal(this.stepper.direction(), 1);
+      test.done();
+    });
+    
+  },
+
+  directionCCW: function(test) {
+    this.stepper = new Stepper({
+      board: this.board,
+      type: Stepper.DEVICE.FOUR_WIRE,
+      stepsPerRev: 200,
+      pins: [2, 3, 4, 5],
+      speed: 100
+    });
+
+    test.expect(2);
+    
+    this.stepper.direction(0).step(5, position => {
+      test.equal(position, -5);
+      test.equal(this.stepper.direction(), 0);
+      test.done();
+    });
+    
+  },
+
+  directionCCWNegative: function(test) {
+    this.stepper = new Stepper({
+      board: this.board,
+      type: Stepper.DEVICE.FOUR_WIRE,
+      stepsPerRev: 200,
+      pins: [2, 3, 4, 5],
+      speed: 100
+    });
+
+    test.expect(2);
+    
+    this.stepper.direction(0).step(-5, position => {
+      test.equal(position, 5);
+      test.equal(this.stepper.direction(), 0);
+      test.done();
+    });
+    
+  }
+};
+
+exports["Stepper - CW()/CCW()"] = {
+  setUp: function(done) {
+    this.sandbox = sinon.sandbox.create();
+    this.board = new Board({
+      io: new MockFirmata({
+        pins: [{
+          supportedModes: [8]
+        }]
+      }),
+      debug: false,
+      repl: false
+    });
+
+    this.digitalWrite = this.sandbox.spy(MockFirmata.prototype, "digitalWrite");
+
+    done();
+  },
+
+  tearDown: function(done) {
+    done();
+    this.digitalWrite.restore();
+  },
+
+  CW: function(test) {
+    this.stepper = new Stepper({
+      board: this.board,
+      type: Stepper.DEVICE.FOUR_WIRE,
+      stepsPerRev: 200,
+      pins: [2, 3, 4, 5],
+      speed: 100
+    });
+
+    test.expect(2);
+    
+    this.stepper.cw().step(5, position => {
+      test.equal(position, 5);
+      test.equal(this.stepper.direction(), 1);
+      test.done();
+    });
+    
+  },
+
+  CWNegativeSteps: function(test) {
+    this.stepper = new Stepper({
+      board: this.board,
+      type: Stepper.DEVICE.FOUR_WIRE,
+      stepsPerRev: 200,
+      pins: [2, 3, 4, 5],
+      speed: 100
+    });
+
+    test.expect(2);
+    
+    this.stepper.cw().step(-5, position => {
+      test.equal(position, -5);
+      test.equal(this.stepper.direction(), 1);
+      test.done();
+    });
+    
+  },
+
+  CCW: function(test) {
+    this.stepper = new Stepper({
+      board: this.board,
+      type: Stepper.DEVICE.FOUR_WIRE,
+      stepsPerRev: 200,
+      pins: [2, 3, 4, 5],
+      speed: 100
+    });
+
+    test.expect(2);
+    
+    this.stepper.ccw().step(5, position => {
+      test.equal(position, -5);
+      test.equal(this.stepper.direction(), 0);
+      test.done();
+    });
+    
+  },
+
+  CCWNegative: function(test) {
+    this.stepper = new Stepper({
+      board: this.board,
+      type: Stepper.DEVICE.FOUR_WIRE,
+      stepsPerRev: 200,
+      pins: [2, 3, 4, 5],
+      speed: 100
+    });
+
+    test.expect(2);
+    
+    this.stepper.ccw().step(-5, position => {
+      test.equal(position, 5);
+      test.equal(this.stepper.direction(), 0);
+      test.done();
+    });
+    
+  }
+};
+
+exports["rpm()"] = {
+  setUp: function(done) {
+    this.sandbox = sinon.sandbox.create();
+    this.board = new Board({
+      io: new MockFirmata({
+        pins: [{
+          supportedModes: [8]
+        }]
+      }),
+      debug: false,
+      repl: false
+    });
+
+    this.digitalWrite = this.sandbox.spy(MockFirmata.prototype, "digitalWrite");
+
+    done();
+  },
+
+  tearDown: function(done) {
+    done();
+    this.digitalWrite.restore();
+  },
+
+  rpm: function(test) {
+    this.stepper = new Stepper({
+      board: this.board,
+      type: Stepper.DEVICE.FOUR_WIRE,
+      stepsPerRev: 200,
+      pins: [2, 3, 4, 5],
+      speed: 100
+    });
+
+    test.expect(2);
+    
     this.stepper.rpm(180);
-    test.equal(this.stepper.speed(), 1885);
-    test.done();
-  },
+    test.equal(this.stepper.targetSpeed, 600);
 
-  "speed to rpm": function(test) {
-    test.expect(1);
-    this.stepper.speed(1885);
-    test.equal(this.stepper.rpm(), 180);
+    this.stepper.speed(100);
+    test.equal(this.stepper.rpm(), 30);
+
     test.done();
+    
   }
 };
+
+exports["position()"] = {
+  setUp: function(done) {
+    this.sandbox = sinon.sandbox.create();
+    this.board = new Board({
+      io: new MockFirmata({
+        pins: [{
+          supportedModes: [8]
+        }]
+      }),
+      debug: false,
+      repl: false
+    });
+
+    this.digitalWrite = this.sandbox.spy(MockFirmata.prototype, "digitalWrite");
+
+    done();
+  },
+
+  tearDown: function(done) {
+    done();
+    this.digitalWrite.restore();
+  },
+
+  position: function(test) {
+    this.stepper = new Stepper({
+      board: this.board,
+      type: Stepper.DEVICE.FOUR_WIRE,
+      stepsPerRev: 200,
+      pins: [2, 3, 4, 5],
+      speed: 100
+    });
+
+    test.expect(3);
+    
+    this.stepper.position(1234);
+    test.equal(this.stepper.position(), 1234);
+    test.equal(this.stepper.absolutePosition, 0);
+
+    this.stepper.speed(100).step(-5, () => {
+      test.equal(this.stepper.position(), 1229);
+      test.done();
+    });
+
+  },
+
+  negativePosition: function(test) {
+    this.stepper = new Stepper({
+      board: this.board,
+      type: Stepper.DEVICE.FOUR_WIRE,
+      stepsPerRev: 200,
+      pins: [2, 3, 4, 5],
+      speed: 100
+    });
+
+    test.expect(2);
+    
+    this.stepper.position(-1234);
+    test.equal(this.stepper.position(), -1234);
+
+    this.stepper.speed(100).step(-5, () => {
+      test.equal(this.stepper.position(), -1239);
+      test.done();
+    });
+
+  }
+};
+
+exports["distanceToGo()"] = {
+  setUp: function(done) {
+    this.sandbox = sinon.sandbox.create();
+    this.board = new Board({
+      io: new MockFirmata({
+        pins: [{
+          supportedModes: [8]
+        }]
+      }),
+      debug: false,
+      repl: false
+    });
+
+    this.digitalWrite = this.sandbox.spy(MockFirmata.prototype, "digitalWrite");
+
+    done();
+  },
+
+  tearDown: function(done) {
+    done();
+    this.digitalWrite.restore();
+  },
+
+  rpm: function(test) {
+    this.stepper = new Stepper({
+      board: this.board,
+      type: Stepper.DEVICE.FOUR_WIRE,
+      stepsPerRev: 200,
+      pins: [2, 3, 4, 5],
+      speed: 100
+    });
+
+    test.expect(6);
+    
+    this.stepper.speed(10).to(10, position => {
+      test.equal(position, 10);
+      test.equal(this.stepper.distanceToGo(), 0);
+      test.done();
+    });
+
+    setTimeout( () => {
+      test.equal(this.stepper.position(), 2);
+      test.equal(this.stepper.distanceToGo(), 8);
+    }, 250);
+
+    setTimeout( () => {
+      test.equal(this.stepper.position(), 7);
+      test.equal(this.stepper.distanceToGo(), 3);
+    }, 750);
+  }
+};
+
+exports["Stepper - step two-wire"] = {
+  setUp: function(done) {
+    this.sandbox = sinon.sandbox.create();
+    this.board = new Board({
+      io: new MockFirmata({
+        pins: [{
+          supportedModes: [8]
+        }]
+      }),
+      debug: false,
+      repl: false
+    });
+
+    this.digitalWrite = this.sandbox.spy(MockFirmata.prototype, "digitalWrite");
+
+    done();
+  },
+
+  tearDown: function(done) {
+    done();
+    this.digitalWrite.restore();
+  },
+  
+  twowirewhole: function(test) {
+    this.stepper = new Stepper({
+      board: this.board,
+      type: Stepper.DEVICE.TWO_WIRE,
+      stepsPerRev: 200,
+      pins: [2, 3],
+      speed: 100
+    });
+
+    test.expect(11);
+    
+    this.stepper.step(5, position => {
+      [
+        [2, 1, true], [3, 1, true], // Frame 1
+        [2, 0, true], [3, 1, true], // Frame 2
+        [2, 0, true], [3, 0, true], // Frame 3
+        [2, 1, true], [3, 0, true], // Frame 0
+        [2, 1, true], [3, 1, true] //  Frame 1
+      ].forEach((args, index) => {
+        test.deepEqual(this.digitalWrite.getCall(index).args, args);
+      });
+
+      test.equal(position, 5);
+      test.done();
+    });
+    
+  },
+
+  twowirewholeDirection: function(test) {
+    this.stepper = new Stepper({
+      board: this.board,
+      type: Stepper.DEVICE.TWO_WIRE,
+      stepsPerRev: 200,
+      pins: [2, 3],
+      speed: 100,
+      direction: 0
+    });
+
+    test.expect(11);
+    
+    this.stepper.step(5, position => {
+      [
+        [2, 0, true], [3, 0, true], // Frame 3
+        [2, 0, true], [3, 1, true], // Frame 2
+        [2, 1, true], [3, 1, true], // Frame 1
+        [2, 1, true], [3, 0, true], // Frame 0
+        [2, 0, true], [3, 0, true], // Frame 3
+      ].forEach((args, index) => {
+        test.deepEqual(this.digitalWrite.getCall(index).args, args);
+      });
+
+      test.equal(position, -5);
+      test.done();
+    });
+    
+  },
+
+  twowirewholeNegativeSteps: function(test) {
+    this.stepper = new Stepper({
+      board: this.board,
+      type: Stepper.DEVICE.TWO_WIRE,
+      stepsPerRev: 200,
+      pins: [2, 3],
+      speed: 100
+    });
+
+    test.expect(11);
+    
+    this.stepper.step(-5, position => {
+      [
+        [2, 0, true], [3, 0, true], // Frame 3
+        [2, 0, true], [3, 1, true], // Frame 2
+        [2, 1, true], [3, 1, true], // Frame 1
+        [2, 1, true], [3, 0, true], // Frame 0
+        [2, 0, true], [3, 0, true], // Frame 3
+      ].forEach((args, index) => {
+        test.deepEqual(this.digitalWrite.getCall(index).args, args, "Incorrect args on step " + Math.floor(index / 2));
+      });
+
+      test.equal(position, -5);
+      test.done();
+    });
+    
+  },
+
+  twowirewholeDirectionNegativeSteps: function(test) {
+    this.stepper = new Stepper({
+      board: this.board,
+      type: Stepper.DEVICE.TWO_WIRE,
+      stepsPerRev: 200,
+      pins: [2, 3],
+      speed: 100,
+      direction: 0
+    });
+
+    test.expect(11);
+    
+    this.stepper.step(-5, position => {
+      [
+        [2, 1, true], [3, 1, true], // Frame 1
+        [2, 0, true], [3, 1, true], // Frame 2
+        [2, 0, true], [3, 0, true], // Frame 3
+        [2, 1, true], [3, 0, true], // Frame 0
+        [2, 1, true], [3, 1, true], // Frame 1
+      ].forEach((args, index) => {
+        test.deepEqual(this.digitalWrite.getCall(index).args, args, "Incorrect args on step " + Math.floor(index / 2));
+      });
+
+      test.equal(position, 5);
+      test.done();
+    });
+    
+  },
+
+  twowirewholePosition: function(test) {
+    this.stepper = new Stepper({
+      board: this.board,
+      type: Stepper.DEVICE.TWO_WIRE,
+      stepsPerRev: 200,
+      pins: [2, 3],
+      speed: 100,
+      position: 1000
+    });
+
+    test.expect(11);
+    
+    this.stepper.step(5, position => {
+      [
+        [2, 1, true], [3, 1, true], // Frame 1
+        [2, 0, true], [3, 1, true], // Frame 2
+        [2, 0, true], [3, 0, true], // Frame 3
+        [2, 1, true], [3, 0, true], // Frame 0
+        [2, 1, true], [3, 1, true], // Frame 1
+      ].forEach((args, index) => {
+        test.deepEqual(this.digitalWrite.getCall(index).args, args);
+      });
+
+      test.equal(position, 1005);
+      test.done();
+    });
+    
+  }
+ 
+};
+
+
